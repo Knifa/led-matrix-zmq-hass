@@ -1,20 +1,13 @@
 import voluptuous as vol
 
+import aiohttp
+
 from typing import Any
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.components.zeroconf import ZeroconfServiceInfo
 
-from .const import DOMAIN, CONF_NAME, CONF_HOST, CONF_PORT
-
-
-DATA_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_NAME): str,
-        vol.Required(CONF_HOST): str,
-        vol.Required(CONF_PORT, default=4200): int,
-    }
-)
+from .const import DOMAIN, CONF_NAME, CONF_URL
 
 
 class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -22,38 +15,46 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def __init__(self) -> None:
         self._name: str | None = None
-        self._hostname: str | None = None
-        self._port: int | None = None
+        self._url: str | None = None
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
+        errors = {}
+
         if user_input is not None:
+            name = user_input[CONF_NAME].strip()
+            url = user_input[CONF_URL].strip().removesuffix("/")
+
             for entry in self._async_current_entries():
-                if (
-                    (
-                        entry.data[CONF_HOST] == user_input[CONF_HOST]
-                        and entry.data[CONF_PORT] == user_input[CONF_PORT]
-                    )
-                    or entry.data[CONF_NAME] == user_input[CONF_NAME]
-                ):
+                if entry.data[CONF_NAME] == name or entry.data[CONF_URL] == url:
                     return self.async_abort(reason="already_configured")
 
-            return self.async_create_entry(
-                title=user_input[CONF_NAME],
-                data=user_input,
-            )
+            if await self._assert_healthcheck(url):
+                return self.async_create_entry(
+                    title=name,
+                    data=user_input,
+                )
+            else:
+                errors["base"] = "cannot_connect"
 
-        return self.async_show_form(step_id="user", data_schema=DATA_SCHEMA)
+        return self.async_show_form(
+            step_id="user",
+            data_schema=self._get_data_schema(
+                user_input.get(CONF_NAME) if user_input is not None else None,
+                user_input.get(CONF_URL) if user_input is not None else None,
+            ),
+            errors=errors,
+            final_step=True,
+        )
 
     async def async_step_zeroconf(
         self, discovery_info: ZeroconfServiceInfo
     ) -> ConfigFlowResult:
-        self._hostname = discovery_info.hostname
-        self._name = discovery_info.name
-        self._port = discovery_info.port
+        self._name = discovery_info.name.removesuffix(f".{discovery_info.type}")
+        self._url = f"http://{discovery_info.ip_address}:{discovery_info.port}"
 
-        await self.async_set_unique_id(f"{self._hostname}:{self._port}")
+        await self.async_set_unique_id(self._url)
         self._abort_if_unique_id_configured()
 
         self.context["title_placeholders"] = {"name": self._name}
@@ -64,21 +65,40 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         assert self._name
-        assert self._hostname
-        assert self._port
+        assert self._url
 
-        if user_input is None:
-            return self.async_show_form(
-                step_id="zeroconf_confirm",
-                description_placeholders={"name": self._name},
+        errors = {}
 
-            )
+        if user_input is not None:
+            if await self._assert_healthcheck(self._url):
+                return self.async_create_entry(
+                    title=self._name,
+                    data={CONF_NAME: self._name, CONF_URL: self._url},
+                )
+            else:
+                errors["base"] = "cannot_connect"
 
-        return self.async_create_entry(
-            title=self._name,
-            data={
-                CONF_NAME: self._name,
-                CONF_HOST: self._hostname,
-                CONF_PORT: self._port,
-            },
+        return self.async_show_form(
+            step_id="zeroconf_confirm",
+            description_placeholders={"name": self._name, "url": self._url},
+            errors=errors,
+            last_step=True,
+        )
+
+    @staticmethod
+    async def _assert_healthcheck(url: str) -> bool:
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(f"{url}/healthcheck") as response:
+                    return response.status == 200
+        except aiohttp.ClientError:
+            return False
+
+    @staticmethod
+    def _get_data_schema(name: str | None = None, url: str | None = None) -> vol.Schema:
+        return vol.Schema(
+            {
+                vol.Required(CONF_NAME, default=name): str,
+                vol.Required(CONF_URL, default=url): str,
+            }
         )

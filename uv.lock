@@ -855,7 +855,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "homeassistant", specifier = ">=2024.11.3" }]
+requires-dist = [{ name = "homeassistant", specifier = ">=2024.11.0" }]
 
 [package.metadata.requires-dev]
 dev = [

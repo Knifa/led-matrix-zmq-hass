@@ -11,5 +11,4 @@ DOMAIN: Final = "led_matrix_zmq"
 PLATFORMS: Final = [Platform.LIGHT]
 
 CONF_NAME: Final = "name"
-CONF_HOST: Final = "host"
-CONF_PORT: Final = "port"
+CONF_URL: Final = "url"
