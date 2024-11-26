@@ -7,6 +7,7 @@ from typing import Any
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.components.zeroconf import ZeroconfServiceInfo
 
+from .api import LmzApi
 from .const import DOMAIN, CONF_NAME, CONF_URL
 
 
@@ -30,7 +31,7 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
                 if entry.data[CONF_NAME] == name or entry.data[CONF_URL] == url:
                     return self.async_abort(reason="already_configured")
 
-            if await self._assert_healthcheck(url):
+            if await self._assert_health(url):
                 return self.async_create_entry(
                     title=name,
                     data=user_input,
@@ -45,7 +46,7 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
                 user_input.get(CONF_URL) if user_input is not None else None,
             ),
             errors=errors,
-            final_step=True,
+            last_step=True,
         )
 
     async def async_step_zeroconf(
@@ -70,7 +71,7 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input is not None:
-            if await self._assert_healthcheck(self._url):
+            if await self._assert_health(self._url):
                 return self.async_create_entry(
                     title=self._name,
                     data={CONF_NAME: self._name, CONF_URL: self._url},
@@ -86,13 +87,8 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
-    async def _assert_healthcheck(url: str) -> bool:
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{url}/healthcheck") as response:
-                    return response.status == 200
-        except aiohttp.ClientError:
-            return False
+    async def _assert_health(url: str) -> bool:
+        return await LmzApi(url).assert_health()
 
     @staticmethod
     def _get_data_schema(name: str | None = None, url: str | None = None) -> vol.Schema:
