@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add a new led-matrix-zmq device",
+        "description": "Enter the details of led-matrix-zmq device you want to add to Home Assistant.",
+        "data": {
+          "name": "Name",
+          "host": "Host (or IP address)",
+          "port": "Port"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Discovered led-matrix-zmq device",
+        "description": "Do you want to add the led-matrix-zmq device `{name}` to Home Assistant?"
+      }
+    },
+    "error": {
+      "unknown": "Unknown error occurred."
+    },
+    "abort": {
+      "already_configured": "This device is already configured."
+    }
+  }
+}

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+LMZ_DIR="${PWD}/custom_components/led_matrix_zmq"
+
+if ! cmp -s "${LMZ_DIR}/strings.json" "${LMZ_DIR}/translations/en.json"; then
+  echo "strings.json and translations/en.json are not in sync"
+fi
+
+hass --config "${PWD}/config" --debug $@

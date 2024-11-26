@@ -1,0 +1,23 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Tools
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Misc.
+.vscode/
+
+# HASS
+config/*
+!config/configuration.yaml
+!config/custom_components
