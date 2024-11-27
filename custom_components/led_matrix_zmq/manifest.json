@@ -3,7 +3,7 @@
   "config_flow": true,
   "dependencies": ["light"],
   "documentation": "https://github.com/Knifa/led-matrix-zmq-hass",
-  "domain": "lmz",
+  "domain": "led_matrix_zmq",
   "integration_type": "device",
   "iot_class": "local_polling",
   "name": "led-matrix-zmq",
