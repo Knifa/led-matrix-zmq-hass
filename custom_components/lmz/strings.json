@@ -1,4 +1,5 @@
 {
+  "title": "led-matrix-zmq",
   "config": {
     "step": {
       "user": {
