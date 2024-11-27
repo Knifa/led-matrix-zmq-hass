@@ -1,8 +1,8 @@
 {
-  "domain": "led_matrix_zmq",
+  "domain": "lmz",
   "name": "led-matrix-zmq",
   "codeowners": [],
-  "documentation": "https://www.example.com",
+  "documentation": "https://github.com/Knifa/led-matrix-zmq-hass",
   "integration_type": "device",
   "iot_class": "local_polling",
   "requirements": [],

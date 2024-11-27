@@ -7,7 +7,7 @@ from homeassistant.const import Platform
 
 LOGGER: Final = logging.getLogger(__package__)
 
-DOMAIN: Final = "led_matrix_zmq"
+DOMAIN: Final = "lmz"
 PLATFORMS: Final = [Platform.LIGHT]
 
 CONF_NAME: Final = "name"

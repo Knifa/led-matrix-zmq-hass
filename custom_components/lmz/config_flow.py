@@ -1,7 +1,5 @@
 import voluptuous as vol
 
-import aiohttp
-
 from typing import Any
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
