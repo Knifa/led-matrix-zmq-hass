@@ -1,4 +1,4 @@
 {
-    "name": "led-matrix-zmq",
-    "homeassistant": "2024.11.0"
+  "homeassistant": "2024.11.0",
+  "name": "led-matrix-zmq"
 }

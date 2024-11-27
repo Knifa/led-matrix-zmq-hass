@@ -1,12 +1,13 @@
 {
-  "domain": "lmz",
-  "name": "led-matrix-zmq",
   "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["light"],
   "documentation": "https://github.com/Knifa/led-matrix-zmq-hass",
+  "domain": "lmz",
   "integration_type": "device",
   "iot_class": "local_polling",
+  "name": "led-matrix-zmq",
   "requirements": [],
   "version": "0.0.0",
-  "config_flow": true,
   "zeroconf": ["_lmz-control-api._tcp.local."]
 }
