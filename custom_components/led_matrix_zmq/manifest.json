@@ -9,5 +9,5 @@
   "name": "led-matrix-zmq",
   "requirements": [],
   "version": "0.0.0",
-  "zeroconf": ["_lmz-control-api._tcp.local."]
+  "zeroconf": ["_lmz-http-bridge._tcp.local."]
 }
