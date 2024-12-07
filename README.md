@@ -6,7 +6,7 @@ Devices are automatically discovered via Zeroconf and can be controlled as regul
 
 ## Usage
 
-1. Install the integration via HACS as a custom repository.
+1. Install the integration via HACS.
 2. Wait for the devices to be discovered.
 3. Add the devices.
 4. You did it!
