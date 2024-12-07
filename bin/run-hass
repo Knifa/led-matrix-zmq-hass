@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-LMZ_DIR="${PWD}/custom_components/led_matrix_zmq"
+lmz_dir="./custom_components/led_matrix_zmq"
 
-if ! cmp -s "${LMZ_DIR}/strings.json" "${LMZ_DIR}/translations/en.json"; then
+if ! cmp -s "${lmz_dir}/strings.json" "${lmz_dir}/translations/en.json"; then
   echo "strings.json and translations/en.json are not in sync"
 fi
 
-hass --config "${PWD}/config" --debug $@
+hass --config ./config --debug $@

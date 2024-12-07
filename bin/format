@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-packages="custom_components/led_matrix_zmq"
+packages="./custom_components/led_matrix_zmq"
 
 ruff check --select I --fix $packages
 ruff format $packages

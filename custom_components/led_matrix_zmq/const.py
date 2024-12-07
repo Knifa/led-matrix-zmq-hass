@@ -1,9 +1,7 @@
 import logging
-
 from typing import Final
 
 from homeassistant.const import Platform
-
 
 LOGGER: Final = logging.getLogger(__package__)
 

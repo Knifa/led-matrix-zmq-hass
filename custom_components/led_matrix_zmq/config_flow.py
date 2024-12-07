@@ -1,12 +1,11 @@
-import voluptuous as vol
-
 from typing import Any
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+import voluptuous as vol
 from homeassistant.components.zeroconf import ZeroconfServiceInfo
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 
 from .api import LmzApi
-from .const import DOMAIN, CONF_NAME, CONF_URL
+from .const import CONF_NAME, CONF_URL, DOMAIN
 
 
 class LmzConfigFlow(ConfigFlow, domain=DOMAIN):

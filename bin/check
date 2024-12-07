@@ -2,7 +2,12 @@
 
 set -euo pipefail
 
-packages="custom_components/led_matrix_zmq"
+lmz_dir="./custom_components/led_matrix_zmq"
+packages="${lmz_dir}"
 
 ruff check $packages
 mypy $packages
+
+if ! cmp -s "${lmz_dir}/strings.json" "${lmz_dir}/translations/en.json"; then
+  echo "strings.json and translations/en.json are not in sync"
+fi

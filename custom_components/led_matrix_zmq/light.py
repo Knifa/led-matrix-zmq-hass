@@ -1,6 +1,6 @@
-from homeassistant.core import HomeAssistant
+from homeassistant.components.light import ColorMode, LightEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.components.light import LightEntity, ColorMode
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import LmzApi
