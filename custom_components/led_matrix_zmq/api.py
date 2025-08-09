@@ -11,9 +11,9 @@ class LmzApi:
             data = await res.json()
             return data["brightness"]
 
-    async def set_brightness(self, brightness: int) -> None:
+    async def set_brightness(self, brightness: int, transition: int = 0) -> None:
         async with self._session.post(
-            "/brightness", json={"brightness": brightness}
+            "/brightness", json={"brightness": brightness, "transition": transition}
         ) as res:
             res.raise_for_status()
 
@@ -23,9 +23,9 @@ class LmzApi:
             data = await res.json()
             return data["temperature"]
 
-    async def set_temperature(self, temperature: int) -> None:
+    async def set_temperature(self, temperature: int, transition: int = 0) -> None:
         async with self._session.post(
-            "/temperature", json={"temperature": temperature}
+            "/temperature", json={"temperature": temperature, "transition": transition}
         ) as res:
             res.raise_for_status()
 

@@ -1,11 +1,11 @@
 from typing import Any
 
 import voluptuous as vol
-from homeassistant.components.zeroconf import ZeroconfServiceInfo
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlowWithReload
 
 from .api import LmzApi
-from .const import CONF_NAME, CONF_URL, DOMAIN
+from .const import CONF_DEFAULT_TRANSITION, CONF_NAME, CONF_URL, DEFAULT_TRANSITION, DOMAIN
 
 
 class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -84,6 +84,10 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
     @staticmethod
+    def async_get_options_flow(config_entry):
+        return LmzOptionsFlowHandler()
+
+    @staticmethod
     async def _assert_health(url: str) -> bool:
         return await LmzApi(url).assert_health()
 
@@ -95,3 +99,22 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_URL, default=url): str,
             }
         )
+
+
+class LmzOptionsFlowHandler(OptionsFlowWithReload):
+    async def async_step_init(self, user_input=None):
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self._get_options_schema()
+        )
+
+    def _get_options_schema(self) -> vol.Schema:
+        return vol.Schema({
+            vol.Optional(
+                CONF_DEFAULT_TRANSITION,
+                default=self.config_entry.options.get(CONF_DEFAULT_TRANSITION, DEFAULT_TRANSITION)
+            ): vol.All(vol.Coerce(float), vol.Range(min=0, max=30))
+        })

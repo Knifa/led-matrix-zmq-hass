@@ -4,7 +4,7 @@
     "step": {
       "user": {
         "title": "Add a new led-matrix-zmq device",
-        "description": "Enter the details of led-matrix-zmq device you want to add to Home Assistant.",
+        "description": "Enter the details of the led-matrix-zmq device you want to add to Home Assistant.",
         "data": {
           "name": "Name",
           "host": "Host (or IP address)",
@@ -22,6 +22,17 @@
     },
     "abort": {
       "already_configured": "This device is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "led-matrix-zmq Options",
+        "description": "Configure options for the led-matrix-zmq device.",
+        "data": {
+          "default_transition": "Default transition time (seconds)"
+        }
+      }
     }
   }
 }
