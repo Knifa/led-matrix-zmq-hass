@@ -1,6 +1,6 @@
 # led-matrix-zmq-hass
 
-This is a Home Assistant integration for controlling [led-matrix-zmq-server](https://github.com/Knifa/led-matrix-zmq-server) via [led-matrix-zmq-control-api](https://github.com/Knifa/led-matrix-zmq-control-api).
+This is a Home Assistant integration for controlling [led-matrix-zmq-server](https://github.com/Knifa/led-matrix-zmq-server) via [led-matrix-zmq-http-bridge](https://github.com/Knifa/led-matrix-zmq-http-bridge).
 
 Devices are automatically discovered via Zeroconf and can be controlled as regular light entities.
 
