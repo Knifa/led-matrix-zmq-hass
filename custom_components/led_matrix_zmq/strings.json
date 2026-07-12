@@ -7,8 +7,7 @@
         "description": "Enter the details of the led-matrix-zmq device you want to add to Home Assistant.",
         "data": {
           "name": "Name",
-          "host": "Host (or IP address)",
-          "port": "Port"
+          "url": "URL"
         }
       },
       "zeroconf_confirm": {
@@ -18,6 +17,7 @@
     },
     "error": {
       "cannot_connect": "Unable to connect to the device.",
+      "name_exists": "A device with this name is already configured.",
       "unknown": "Unknown error occurred."
     },
     "abort": {

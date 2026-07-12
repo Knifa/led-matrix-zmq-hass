@@ -1,11 +1,22 @@
 from typing import Any
 
 import voluptuous as vol
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlowWithReload
+from homeassistant.config_entries import (
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlowWithReload,
+)
 
 from .api import LmzApi
-from .const import CONF_DEFAULT_TRANSITION, CONF_NAME, CONF_URL, DEFAULT_TRANSITION, DOMAIN
+from .const import (
+    CONF_DEFAULT_TRANSITION,
+    CONF_NAME,
+    CONF_URL,
+    DEFAULT_TRANSITION,
+    DOMAIN,
+)
 
 
 class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -24,14 +35,18 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
             name = user_input[CONF_NAME].strip()
             url = user_input[CONF_URL].strip().removesuffix("/")
 
-            for entry in self._async_current_entries():
-                if entry.data[CONF_NAME] == name or entry.data[CONF_URL] == url:
-                    return self.async_abort(reason="already_configured")
+            await self.async_set_unique_id(url)
+            self._abort_if_unique_id_configured()
 
-            if await self._assert_health(url):
+            if any(
+                entry.data[CONF_NAME] == name
+                for entry in self._async_current_entries()
+            ):
+                errors[CONF_NAME] = "name_exists"
+            elif await self._assert_health(url):
                 return self.async_create_entry(
                     title=name,
-                    data=user_input,
+                    data={CONF_NAME: name, CONF_URL: url},
                 )
             else:
                 errors["base"] = "cannot_connect"
@@ -87,9 +102,9 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry):
         return LmzOptionsFlowHandler()
 
-    @staticmethod
-    async def _assert_health(url: str) -> bool:
-        return await LmzApi(url).assert_health()
+    async def _assert_health(self, url: str) -> bool:
+        api = LmzApi(async_get_clientsession(self.hass), url)
+        return await api.is_healthy()
 
     @staticmethod
     def _get_data_schema(name: str | None = None, url: str | None = None) -> vol.Schema:
@@ -107,14 +122,17 @@ class LmzOptionsFlowHandler(OptionsFlowWithReload):
             return self.async_create_entry(data=user_input)
 
         return self.async_show_form(
-            step_id="init",
-            data_schema=self._get_options_schema()
+            step_id="init", data_schema=self._get_options_schema()
         )
 
     def _get_options_schema(self) -> vol.Schema:
-        return vol.Schema({
-            vol.Optional(
-                CONF_DEFAULT_TRANSITION,
-                default=self.config_entry.options.get(CONF_DEFAULT_TRANSITION, DEFAULT_TRANSITION)
-            ): vol.All(vol.Coerce(float), vol.Range(min=0, max=30))
-        })
+        return vol.Schema(
+            {
+                vol.Optional(
+                    CONF_DEFAULT_TRANSITION,
+                    default=self.config_entry.options.get(
+                        CONF_DEFAULT_TRANSITION, DEFAULT_TRANSITION
+                    ),
+                ): vol.All(vol.Coerce(float), vol.Range(min=0, max=30))
+            }
+        )

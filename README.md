@@ -10,3 +10,9 @@ Devices are automatically discovered via Zeroconf and can be controlled as regul
 2. Wait for the devices to be discovered.
 3. Add the devices.
 4. You did it!
+
+## Options
+
+Each device has a configurable **default transition** (in seconds, 0-30) applied
+to brightness/colour changes that don't explicitly specify a `transition`. Find
+it under the device's entry in Settings → Devices & Services → Configure.
