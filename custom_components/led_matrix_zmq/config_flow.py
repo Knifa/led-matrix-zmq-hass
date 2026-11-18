@@ -39,8 +39,7 @@ class LmzConfigFlow(ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
 
             if any(
-                entry.data[CONF_NAME] == name
-                for entry in self._async_current_entries()
+                entry.data[CONF_NAME] == name for entry in self._async_current_entries()
             ):
                 errors[CONF_NAME] = "name_exists"
             elif await self._assert_health(url):
