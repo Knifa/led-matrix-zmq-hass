@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 import aiohttp
@@ -15,12 +16,14 @@ class LmzApi:
     def __init__(self, session: aiohttp.ClientSession, url: str) -> None:
         self._session = session
         self._url = url.rstrip("/")
+        self._lock = asyncio.Lock()
 
     async def _get(self, path: str) -> dict[str, Any]:
         try:
-            async with self._session.get(
-                f"{self._url}{path}", timeout=TIMEOUT
-            ) as res:
+            async with (
+                self._lock,
+                self._session.get(f"{self._url}{path}", timeout=TIMEOUT) as res,
+            ):
                 res.raise_for_status()
                 return await res.json()
         except (aiohttp.ClientError, TimeoutError) as err:
@@ -28,9 +31,12 @@ class LmzApi:
 
     async def _post(self, path: str, payload: dict[str, Any]) -> None:
         try:
-            async with self._session.post(
-                f"{self._url}{path}", json=payload, timeout=TIMEOUT
-            ) as res:
+            async with (
+                self._lock,
+                self._session.post(
+                    f"{self._url}{path}", json=payload, timeout=TIMEOUT
+                ) as res,
+            ):
                 res.raise_for_status()
         except (aiohttp.ClientError, TimeoutError) as err:
             raise LmzApiError(f"POST {path} failed: {err}") from err
@@ -60,9 +66,10 @@ class LmzApi:
 
     async def is_healthy(self) -> bool:
         try:
-            async with self._session.get(
-                f"{self._url}/healthcheck", timeout=TIMEOUT
-            ) as res:
+            async with (
+                self._lock,
+                self._session.get(f"{self._url}/healthcheck", timeout=TIMEOUT) as res,
+            ):
                 res.raise_for_status()
         except (aiohttp.ClientError, TimeoutError):
             return False
